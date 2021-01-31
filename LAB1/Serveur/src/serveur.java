@@ -13,35 +13,54 @@ public class serveur {
 	private static ServerSocket listener;
 	
 	
-	private static boolean isIP(String ip) {
-		if(ip.contains("^[a-zA-Z]+")) {
-			//reste beaucoup de contraintes à coder
-			return false;
-		}
-		return true;
-	}
+	
 	private static boolean isPort(int port) {
 		if(5000<=port && port <= 5050)
 			return true;
 		return false;
+	}
+	
+	private static Integer[] IP(Scanner sc) {
+		
+		sc.useDelimiter("[:\\.|\\r]");
+		System.out.println("Entrer l'addresse IP du Client");
+		
+		Integer[] IPbytes = new Integer[4];
+		for(int i=0;i<4;i++) {
+			try {
+				String temp = sc.next();
+				IPbytes[i] = Integer.parseInt(temp);
+				if(IPbytes[i]>255 || IPbytes[i]<0) {
+					System.out.println("Entrer un nombre entre 0 et 255");
+					i--;
+				}
+			}
+			catch(Exception e) {
+				System.out.println("Entrer un nombre");
+				i--;
+			}
+			
+			
+		}
+		return IPbytes;
 	}
 
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
 		
 		
-		//Demander les info de mande à l'utilisateur
+		//Demander les info demande à l'utilisateur
 		Scanner sc = new Scanner(System.in);
 		
-		boolean isIP = false;
-		String serverAddress = "abcd";
-		while(!isIP) {
-			System.out.println("Veuillez entrer l'addresse IP du serveur");
-			serverAddress = sc.next();
-			isIP = isIP(serverAddress);
-		}
+		Integer IPbytes[]= IP(sc);
 		
-		System.out.println("Veuillez entrer le no de client");
+		String serverAddress = IPbytes[0] + "." +
+							   IPbytes[1] + "." +
+							   IPbytes[2] + "." + 
+							   IPbytes[3]; 
+		
+		System.out.println("L'addresse IP est: " + serverAddress);
+		/*System.out.println("Veuillez entrer le no de client");
 		int clientNumber = sc.nextInt();
 		
 		
@@ -51,7 +70,10 @@ public class serveur {
 			System.out.println("Veuillez entrer le port du serveur");
 			serverPort = sc.nextInt();
 			isPort = isPort(serverPort);
-		}
+		}*/
+		
+		int clientNumber=0;
+		int serverPort=0;
 		
 		//Création de la connexion pour communiquer avec
 		listener = new ServerSocket();
