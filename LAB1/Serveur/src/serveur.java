@@ -84,6 +84,63 @@ public class serveur {
 	}
 	
 	
+	private static void commands() {
+		/*
+		 * Commandes[0] est la commande
+		 * le reste des index sont les argument*/
+		
+		//TODO définir la string entrees correctement
+		String entrees = "L'entré venant du client";
+		
+		String[] commandes = entrees.split(" ",2);
+		
+		switch(commandes[0]) {
+		case "cd":
+			cd(commandes[1]);
+			break;
+		case "ls":
+			ls();
+			break;
+		case "mkdir":
+			mkdir(commandes[1]);
+			break;
+		case "upload":
+			upload(commandes[1]);
+			break;
+		case "download":
+			download(commandes[1]);
+			break;
+		case "exit":
+			exit();
+			break;
+		default:
+			System.out.println("Commande invalide");
+		}
+		
+		
+	}
+	private static void cd(String whereTo) {
+		
+	}
+	private static void ls() {
+		
+	}
+	private static void mkdir(String directoryName) {
+		
+	}
+	private static void upload(String fileName) {
+		
+	}
+	private static void download(String fileName) {
+		
+	}
+	private static void exit() {
+		
+	}
+	
+	
+	
+	
 	public static void main(String[] args) throws Exception{
 		
 		askAddress();
