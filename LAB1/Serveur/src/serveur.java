@@ -11,71 +11,82 @@ import java.util.*;
 public class serveur {
 	
 	private static ServerSocket listener;
+	private static String ip = "";
+	private static int port =0;
+	private static Scanner keyboard = new Scanner(System.in);
 	
-	
-	
-	private static boolean isPort(int port) {
-		if(5000<=port && port <= 5050)
-			return true;
-		return false;
-	}
-	
-	private static Integer[] IP(Scanner sc) {
+	private static void Address() {
 		
-		sc.useDelimiter("[:\\.|\\r]");
-		System.out.println("Entrer l'addresse IP du Client");
+		boolean hasValidAddress = false;
 		
-		Integer[] IPbytes = new Integer[4];
-		for(int i=0;i<4;i++) {
-			try {
-				String temp = sc.next();
-				IPbytes[i] = Integer.parseInt(temp);
-				if(IPbytes[i]>255 || IPbytes[i]<0) {
-					System.out.println("Entrer un nombre entre 0 et 255");
-					i--;
+		
+		String badIP = "Veuillez entrer des nombres entre 0 et 255 sï¿½parï¿½ par un .\n Par exemple, 152.0.54.254";
+		String badPort = "Veuillez entrer uniquement un nombre entre 5000 et 5050 pour le port";
+		
+		System.out.println("Veuiller entrer votre addresse IP, composï¿½ de quatre entier entre 0 et 255,\n suivi du port, entre 5000 et 5050");
+		
+		do {
+			
+			hasValidAddress = true;
+					String ligne = keyboard.nextLine();
+			//Sï¿½parer les octets par "." et le port par ":"
+			String entrees[] = ligne.split("[:\\.]");
+		
+			//Valider l'addresse IP
+			for(int i=0;i<4;i++) {
+				int temp;
+				try {
+					temp = Integer.parseInt(entrees[i]);
+					if(temp<0 || temp >255) {
+						System.out.println(badIP);
+						hasValidAddress = false;
+					}
+				}catch(Exception e) {
+					System.out.println(badIP);
+					hasValidAddress = false;
 				}
 			}
-			catch(Exception e) {
-				System.out.println("Entrer un nombre");
-				i--;
+		
+			//Valider le port
+			try {
+				int temp = Integer.parseInt(entrees[4]);
+				if(port < 5000 || port > 5050) {
+					System.out.println(badPort);
+					hasValidAddress = false;
+				}
+			}catch(Exception e) {
+				System.out.println(badPort);
+				hasValidAddress = false;
 			}
-			
-			
-		}
-		return IPbytes;
+		
+		
+			ip = entrees[0] + "." + entrees[1] + "." + entrees[2] + "." + entrees[3];
+			port = Integer.parseInt(entrees[4]);
+		
+		
+		
+		
+		}while(!hasValidAddress);
 	}
-
+	
+	
 	public static void main(String[] args) throws Exception{
-		// TODO Auto-generated method stub
+		
+		Address();
+		
+	
+		String serverAddress = "abcd";
 		
 		
-		//Demander les info demande à l'utilisateur
-		Scanner sc = new Scanner(System.in);
-		
-		Integer IPbytes[]= IP(sc);
-		
-		String serverAddress = IPbytes[0] + "." +
-							   IPbytes[1] + "." +
-							   IPbytes[2] + "." + 
-							   IPbytes[3]; 
-		
-		System.out.println("L'addresse IP est: " + serverAddress);
-		/*System.out.println("Veuillez entrer le no de client");
-		int clientNumber = sc.nextInt();
+		System.out.println("Veuillez entrer le no de client");
+		int clientNumber = 1;
 		
 		
 		int serverPort = 0;
 		boolean isPort = false;
-		while(!isPort) {
-			System.out.println("Veuillez entrer le port du serveur");
-			serverPort = sc.nextInt();
-			isPort = isPort(serverPort);
-		}*/
 		
-		int clientNumber=0;
-		int serverPort=0;
 		
-		//Création de la connexion pour communiquer avec
+		//Crï¿½ation de la connexion pour communiquer avec
 		listener = new ServerSocket();
 		InetAddress serverIP = InetAddress.getByName(serverAddress);
 		
