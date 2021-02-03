@@ -15,21 +15,22 @@ public class serveur {
 	private static int port =0;
 	private static Scanner keyboard = new Scanner(System.in);
 	
-	private static void Address() {
+	private static void askAddress() {
 		
 		boolean hasValidAddress = false;
 		
 		
-		String badIP = "Veuillez entrer des nombres entre 0 et 255 sï¿½parï¿½ par un .\n Par exemple, 152.0.54.254";
+		String badIP = "Veuillez entrer des nombres entre 0 et 255 separés par un .\n Par exemple, 152.0.54.254";
 		String badPort = "Veuillez entrer uniquement un nombre entre 5000 et 5050 pour le port";
 		
-		System.out.println("Veuiller entrer votre addresse IP, composï¿½ de quatre entier entre 0 et 255,\n suivi du port, entre 5000 et 5050");
+		
 		
 		do {
 			
+			System.out.println("Veuiller entrer votre addresse IP, compose de quatre entier entre 0 et 255,\n suivi du port, entre 5000 et 5050.\n Par exemple, 127.0.50.254:5043 est une addresse valide.");
 			hasValidAddress = true;
 					String ligne = keyboard.nextLine();
-			//Sï¿½parer les octets par "." et le port par ":"
+			//Separer les octets par "." et le port par ":"
 			String entrees[] = ligne.split("[:\\.]");
 		
 			//Valider l'addresse IP
@@ -50,7 +51,7 @@ public class serveur {
 			//Valider le port
 			try {
 				int temp = Integer.parseInt(entrees[4]);
-				if(port < 5000 || port > 5050) {
+				if(temp < 5000 || temp > 5050) {
 					System.out.println(badPort);
 					hasValidAddress = false;
 				}
@@ -69,21 +70,31 @@ public class serveur {
 		}while(!hasValidAddress);
 	}
 	
+	private static int askClientNo() {
+		int client = 0;
+		do {
+			System.out.println("Veuillez entrer le numero du client");
+			try {
+				client = keyboard.nextInt();
+			}catch(Exception e) {
+				System.out.println("Veuillez entrer un nombre (pas de lettre).");
+			}
+		}while(client==0);
+		return client;
+	}
+	
 	
 	public static void main(String[] args) throws Exception{
 		
-		Address();
+		askAddress();
 		
 	
-		String serverAddress = "abcd";
+		String serverAddress = ip + ":" + port;
 		
 		
 		System.out.println("Veuillez entrer le no de client");
-		int clientNumber = 1;
+		int clientNumber = askClientNo();
 		
-		
-		int serverPort = 0;
-		boolean isPort = false;
 		
 		
 		//Crï¿½ation de la connexion pour communiquer avec
