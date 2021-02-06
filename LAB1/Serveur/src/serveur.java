@@ -12,7 +12,7 @@ public class serveur {
 	
 	private static ServerSocket listener;
 	private static String ip = "";
-	private static int port =0;
+	private static int serverPort =0;
 	private static Scanner keyboard = new Scanner(System.in);
 	
 	private static void askAddress() {
@@ -62,7 +62,7 @@ public class serveur {
 		
 		
 			ip = entrees[0] + "." + entrees[1] + "." + entrees[2] + "." + entrees[3];
-			port = Integer.parseInt(entrees[4]);
+			serverPort = Integer.parseInt(entrees[4]);
 		
 		
 		
@@ -146,7 +146,7 @@ public class serveur {
 		askAddress();
 		
 	
-		String serverAddress = ip + ":" + port;
+		String serverAddress = ip + ":" + serverPort;
 		
 		
 		System.out.println("Veuillez entrer le no de client");
