@@ -27,13 +27,19 @@ public class serveur {
 		
 		do {
 			
-			System.out.println("Veuiller entrer votre addresse IP, compose de quatre entier entre 0 et 255,\n suivi du port, entre 5000 et 5050.\n Par exemple, 127.0.50.254:5043 est une addresse valide.");
 			hasValidAddress = true;
-					String ligne = keyboard.nextLine();
+			String ligne;
 			//Separer les octets par "." et le port par ":"
-			String entrees[] = ligne.split("[:\\.]");
-		
+			String entrees[] = {};		
+			do{
+				System.out.println("Veuiller entrer votre addresse IP, compose de quatre entier entre 0 et 255,\n suivi du port, entre 5000 et 5050.\n Par exemple, 127.0.50.254:5043 est une addresse valide.");
+			    ligne = keyboard.nextLine();
+				entrees = ligne.split("[:\\.]");
+				
+			}while(entrees.length != 5);
+			
 			//Valider l'addresse IP
+			
 			for(int i=0;i<4;i++) {
 				int temp;
 				try {
@@ -47,7 +53,7 @@ public class serveur {
 					hasValidAddress = false;
 				}
 			}
-		
+			
 			//Valider le port
 			try {
 				int temp = Integer.parseInt(entrees[4]);
@@ -56,19 +62,16 @@ public class serveur {
 					hasValidAddress = false;
 				}
 			}catch(Exception e) {
-				System.out.println(badPort);
-				hasValidAddress = false;
+			System.out.println(badPort);
+			hasValidAddress = false;
 			}
-		
-		
 			ip = entrees[0] + "." + entrees[1] + "." + entrees[2] + "." + entrees[3];
-			serverPort = Integer.parseInt(entrees[4]);
-		
-		
-		
-		
-		}while(!hasValidAddress);
-	}
+					serverPort = Integer.parseInt(entrees[4]);
+						
+				
+				
+				}while(!hasValidAddress);
+			}
 	
 	private static int askClientNo() {
 		int client = 0;
@@ -150,7 +153,7 @@ public class serveur {
 		
 		
 		System.out.println("Veuillez entrer le no de client");
-		int clientNumber = askClientNo();
+		int clientNumber = 0;
 		
 		
 		
