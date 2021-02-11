@@ -16,20 +16,20 @@ public class Client {
 	private static int serverPort =0;
 	public static void main(String[] args) throws Exception
 	{
-		String serverAddress= "";
+		
 		boolean isIp= false;
 		
 		
 		askAddress();
-		socket = new Socket(serverAddress,serverPort);
-		System.out.format("Le serveur fonctionne sur :", serverAddress, serverPort);
+		socket = new Socket(ip,serverPort);
+		System.out.format("Le serveur fonctionne sur :", ip, serverPort);
 		
 		
 		DataInputStream in = new DataInputStream(socket.getInputStream());
 		
 		String helloMessageFromServer= in.readUTF();
 		System.out.println("HelloFromServer");
-		
+		//File f = new File("");
 		socket.close();
 		
 	}

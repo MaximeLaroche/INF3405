@@ -149,7 +149,8 @@ public class serveur {
 		askAddress();
 		
 	
-		String serverAddress =  ip ;
+		String serverAddress =  "" ;
+		
 		
 		
 		System.out.println("Veuillez entrer le no de client");
@@ -159,13 +160,14 @@ public class serveur {
 		
 		//Cr�ation de la connexion pour communiquer avec
 		listener = new ServerSocket();
-		InetAddress serverIP = InetAddress.getByName(serverAddress);
+		listener.setReuseAddress(true);
+		InetAddress serverIP = InetAddress.getByName(ip);
 		
 		
 		//Association de l'addresse et du port `ala connexion
 
-		
-		System.out.format("The server is running on %s:%d%n", serverAddress, serverPort);
+		listener.bind(new InetSocketAddress(serverIP, serverPort));
+		System.out.format("The server is running on %s:%d%n", serverIP, serverPort);
 		
 		try
 		{
