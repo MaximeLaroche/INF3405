@@ -16,13 +16,10 @@ public class Client {
 	private static int serverPort =0;
 	public static void main(String[] args) throws Exception
 	{
-		String serverAddress= "";
-		boolean isIp= false;
-		
 		
 		askAddress();
-		socket = new Socket(serverAddress,serverPort);
-		System.out.format("Le serveur fonctionne sur :", serverAddress, serverPort);
+		socket = new Socket(ip,serverPort);
+		System.out.format("Le serveur fonctionne sur :", ip, serverPort);
 		
 		
 		DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -40,9 +37,8 @@ private static void askAddress() {
 		boolean hasValidAddress = false;
 		
 		
-		String badIP = "Veuillez entrer des nombres entre 0 et 255 separés par un .\n Par exemple, 152.0.54.254";
+		String badIP = "Veuillez entrer des nombres entre 0 et 255 separï¿½s par un .\n Par exemple, 152.0.54.254";
 		String badPort = "Veuillez entrer uniquement un nombre entre 5000 et 5050 pour le port";
-		
 		
 		
 		do {
