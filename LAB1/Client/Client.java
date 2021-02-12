@@ -13,20 +13,16 @@ public class Client {
 	private static Socket socket;
 	private static Scanner keyboard = new Scanner(System.in);
 	private static String ip = "";
-	private static int serverPort =0;
+	private static int port =0;
 	public static void main(String[] args) throws Exception
 	{
-		
-		
-		
-		
 		//askAddress();
 		ip="127.0.0.1";
-		serverPort = 5000;
+		port = 5000;
 
 		while(true){
-			socket = new Socket(ip,serverPort);
-			System.out.format("Le serveur fonctionne sur :", ip, serverPort);
+			socket = new Socket(ip,port);
+			System.out.format("Le serveur fonctionne sur :", ip, port);
 		
 		
 			DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -40,7 +36,7 @@ public class Client {
 		
 		
 			System.out.println(helloMessageFromServer);
-			//File f = new File("");
+			//TODO uniquement close le socket quand on veut exit
 			socket.close();
 		}
 	}
@@ -101,7 +97,7 @@ private static void askAddress() {
 			hasValidAddress = false;
 			}
 			ip = entrees[0] + "." + entrees[1] + "." + entrees[2] + "." + entrees[3];
-			serverPort = Integer.parseInt(entrees[4]);
+			port = Integer.parseInt(entrees[4]);
 						
 				
 				
