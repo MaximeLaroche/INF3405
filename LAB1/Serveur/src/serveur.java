@@ -1,4 +1,6 @@
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,15 +14,17 @@ public class serveur {
 	
 	private static ServerSocket listener;
 	private static String ip = "";
-	private static int serverPort =0;
+	private static int serverPort =1;
 	private static Scanner keyboard = new Scanner(System.in);
+
+	private static File currentDirectory;
 	
 	private static void askAddress() {
 		
 		boolean hasValidAddress = false;
 		
 		
-		String badIP = "Veuillez entrer des nombres entre 0 et 255 separés par un .\n Par exemple, 152.0.54.254";
+		String badIP = "Veuillez entrer des nombres entre 0 et 255 separï¿½s par un .\n Par exemple, 152.0.54.254";
 		String badPort = "Veuillez entrer uniquement un nombre entre 5000 et 5050 pour le port";
 		
 		
@@ -73,80 +77,86 @@ public class serveur {
 				}while(!hasValidAddress);
 			}
 	
-	private static int askClientNo() {
-		int client = 0;
-		do {
-			System.out.println("Veuillez entrer le numero du client");
-			try {
-				client = keyboard.nextInt();
-			}catch(Exception e) {
-				System.out.println("Veuillez entrer un nombre (pas de lettre).");
-			}
-		}while(client==0);
-		return client;
-	}
+
 	
 	
-	private static void commands() {
+	private static String commands(String entrees, Socket socket) {
 		/*
 		 * Commandes[0] est la commande
 		 * le reste des index sont les argument*/
-		
-		//TODO définir la string entrees correctement
-		String entrees = "L'entré venant du client";
-		
+		boolean exit = false;
 		String[] commandes = entrees.split(" ",2);
-		
+		String output = "";
 		switch(commandes[0]) {
 		case "cd":
-			cd(commandes[1]);
+			output = cd(commandes[1]);
 			break;
 		case "ls":
-			ls();
+			output = ls();
 			break;
 		case "mkdir":
-			mkdir(commandes[1]);
+			output = mkdir(commandes[1]);
 			break;
 		case "upload":
-			upload(commandes[1]);
+			output = upload(commandes[1]);
 			break;
 		case "download":
-			download(commandes[1]);
+			output = download(commandes[1]);
 			break;
 		case "exit":
-			exit();
+			output = "Client exited the server. Socket closed";
 			break;
 		default:
 			System.out.println("Commande invalide");
 		}
-		
-		
-	}
-	private static void cd(String whereTo) {
+		return output;
 		
 	}
-	private static void ls() {
+	private static String cd(String whereTo) {
+		currentDirectory = new File(whereTo);
+		String message = "Moved to " + whereTo;
+		System.out.println(message);
+		return message;
+	}
+	private static String ls() {
+		String files[] = currentDirectory.list();
+		String message = "";
+		for(String file : files){
+			System.out.println(file);
+			message+=file + "\n";
+		}
+		return message;
+	}
+	private static String mkdir(String directoryName) {
+		System.out.println("On est dans mkdir");
+		String message="";
+		File folder = new File(directoryName);
+		if(folder.mkdir()){
+			message = "votre dossier " + directoryName + " a ete cree";
+			System.out.println(message);
+			//out.writeUTF(message);
+		}
+		return message;
 		
 	}
-	private static void mkdir(String directoryName) {
-		
+	private static String upload(String fileName) {
+		String message = "";
+		return message;
 	}
-	private static void upload(String fileName) {
-		
+	private static String download(String fileName) {
+		String message = "";
+		return message;
 	}
-	private static void download(String fileName) {
-		
-	}
-	private static void exit() {
-		
-	}
+	
 	
 	
 	
 	
 	public static void main(String[] args) throws Exception{
 		
-		askAddress();
+		//askAddress();
+		ip="127.0.0.1";
+		serverPort = 5000;
 		
 	
 		String serverAddress =  "" ;
@@ -154,7 +164,7 @@ public class serveur {
 		
 		
 		System.out.println("Veuillez entrer le no de client");
-		int clientNumber = 1;
+		int clientNumber = 0;
 		
 		
 		
@@ -196,6 +206,7 @@ public class serveur {
 				this.clientNumber = clientNumber;
 				System.out.println("New connection with client#"+ clientNumber + " at "+ socket);
 				
+
 			}
 			public void run()
 			{
@@ -204,6 +215,17 @@ public class serveur {
 					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 					
 					out.writeUTF("Hello from server - you are client# "+ clientNumber);
+
+
+					DataInputStream in = new DataInputStream(socket.getInputStream());
+
+					String query =in.readUTF();
+					System.out.println(query);
+					String message = commands(query,socket);
+
+					out.writeUTF(message);
+
+					socket.close();
 					
 				}catch (IOException e)
 				{
@@ -211,7 +233,7 @@ public class serveur {
 				}
 				
 				
-				System.out.println("Connection with client# " + clientNumber + " closed");
+				
 			}
 		}
 		

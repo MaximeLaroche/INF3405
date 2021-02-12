@@ -17,22 +17,38 @@ public class Client {
 	public static void main(String[] args) throws Exception
 	{
 		
-		boolean isIp= false;
 		
 		
-		askAddress();
-		socket = new Socket(ip,serverPort);
-		System.out.format("Le serveur fonctionne sur :", ip, serverPort);
+		
+		//askAddress();
+		ip="127.0.0.1";
+		serverPort = 5000;
+
+		while(true){
+			socket = new Socket(ip,serverPort);
+			System.out.format("Le serveur fonctionne sur :", ip, serverPort);
 		
 		
-		DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 		
-		String helloMessageFromServer= in.readUTF();
-		System.out.println("HelloFromServer");
-		//File f = new File("");
-		socket.close();
+			String helloMessageFromServer= in.readUTF();
 		
+		
+			out.writeUTF(sendCommand());
+			System.out.println(in.readUTF());
+		
+		
+			System.out.println(helloMessageFromServer);
+			//File f = new File("");
+			socket.close();
+		}
 	}
+
+private static String sendCommand(){
+	System.out.println("Envoyer une commande au serveur");
+	return keyboard.nextLine();
+}
 	
 	//Verifier bonne adresse IP
 private static void askAddress() {
