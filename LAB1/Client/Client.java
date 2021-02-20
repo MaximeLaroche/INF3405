@@ -28,12 +28,46 @@ public class Client {
 		DataInputStream in = new DataInputStream(socket.getInputStream());
 		
 		String helloMessageFromServer= in.readUTF();
+		commands();
 		System.out.println("HelloFromServer");
 		//File f = new File("");
 		socket.close();
 		
 	}
 	
+	private static void commands() {
+		/*
+		 * Commandes[0] est la commande
+		 * le reste des index sont les argument*/
+		
+		//TODO définir la string entrees correctement
+		String entrees = "L'entré une comande:";
+		
+		String[] commandes = entrees.split(" ",2);
+		
+		switch(commandes[0]) {
+		case "cd":
+			//cd(commandes[1]);
+			break;
+		case "ls":
+			//ls();
+			break;
+		case "mkdir":
+			//mkdir(commandes[1]);
+			break;
+		case "upload":
+			//upload(commandes[1]);
+			break;
+		case "download":
+			//download(commandes[1]);
+			break;
+		case "exit":
+			//exit();
+			break;
+		default:
+			System.out.println("Commande invalide");
+		}
+	}	
 	//Verifier bonne adresse IP
 private static void askAddress() {
 		
