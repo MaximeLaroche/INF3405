@@ -46,10 +46,10 @@ private static String sendCommand(){
 	return keyboard.nextLine();
 }
 	
-	private static void commands() {
-		/*
+	/*private static void commands() {
+		/* 
 		 * Commandes[0] est la commande
-		 * le reste des index sont les argument*/
+		 * le reste des index sont les argument
 		
 		//TODO d�finir la string entrees correctement
 		String entrees = "L'entr� une comande:";
@@ -78,7 +78,7 @@ private static String sendCommand(){
 		default:
 			System.out.println("Commande invalide");
 		}
-	}	
+	}*/
 	//Verifier bonne adresse IP
 private static void askAddress() {
 		
