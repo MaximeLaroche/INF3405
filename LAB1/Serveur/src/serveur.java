@@ -118,22 +118,25 @@ public class serveur {
 
 		public void run() {
 			try {
+				
 				while (exit == false) {
-
-					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-
-					out.writeUTF("Hello from server - you are client# " + clientNumber);
-
 					DataInputStream in = new DataInputStream(socket.getInputStream());
-
+					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+					out.writeUTF("Hello from server - you are client# " + clientNumber);
+					
+					
 					String query = in.readUTF();
 					System.out.println(query);
+					
 					String message = commands(query, socket);
 
 					out.writeUTF(message);
-
+					
+				}
+				if(exit == true){
 					socket.close();
 				}
+				
 
 			} catch (IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
@@ -178,18 +181,36 @@ public class serveur {
 			}
 		
 			private static String cd(String whereTo) {
+				String message;
+				/*boolean directoryExists = false;
+				String files[] = currentDirectory.list();
+				currentDirectory.e*/
+				
 				currentDirectory = new File(whereTo);
-				String message = "Moved to " + whereTo;
+				if(currentDirectory.exists()){
+					message = "Moved to " + whereTo + "\n";
+				}else{
+					message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
+				}
+				
+				
 				System.out.println(message);
 				return message;
 			}
 		
 			private static String ls() {
+				if(currentDirectory ==null){
+					currentDirectory = new File(System.getProperty("user.dir"));
+					
+				}
 				String files[] = currentDirectory.list();
 				String message = "";
 				for (String file : files) {
 					System.out.println(file);
 					message += file + "\n";
+				}
+				if(files.length == 0){
+					message = "Directory is empty.\n";
 				}
 				return message;
 			}
