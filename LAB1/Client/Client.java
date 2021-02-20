@@ -13,35 +13,46 @@ public class Client {
 	private static Socket socket;
 	private static Scanner keyboard = new Scanner(System.in);
 	private static String ip = "";
-	private static int serverPort =0;
+	private static int port =0;
 	public static void main(String[] args) throws Exception
 	{
+		//askAddress();
+		ip="127.0.0.1";
+		port = 5000;
+
+		while(true){
+			socket = new Socket(ip,port);
+			System.out.format("Le serveur fonctionne sur :", ip, port);
 		
-		boolean isIp= false;
+		
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+		
+			String helloMessageFromServer= in.readUTF();
 		
 		
-		askAddress();
-		socket = new Socket(ip,serverPort);
-		System.out.format("Le serveur fonctionne sur :", ip, serverPort);
+			out.writeUTF(sendCommand());
+			System.out.println(in.readUTF());
 		
 		
-		DataInputStream in = new DataInputStream(socket.getInputStream());
-		
-		String helloMessageFromServer= in.readUTF();
-		commands();
-		System.out.println("HelloFromServer");
-		//File f = new File("");
-		socket.close();
-		
+			System.out.println(helloMessageFromServer);
+			//TODO uniquement close le socket quand on veut exit
+			socket.close();
+		}
 	}
+
+private static String sendCommand(){
+	System.out.println("Envoyer une commande au serveur");
+	return keyboard.nextLine();
+}
 	
 	private static void commands() {
 		/*
 		 * Commandes[0] est la commande
 		 * le reste des index sont les argument*/
 		
-		//TODO définir la string entrees correctement
-		String entrees = "L'entré une comande:";
+		//TODO dï¿½finir la string entrees correctement
+		String entrees = "L'entrï¿½ une comande:";
 		
 		String[] commandes = entrees.split(" ",2);
 		
@@ -119,7 +130,7 @@ private static void askAddress() {
 			hasValidAddress = false;
 			}
 			ip = entrees[0] + "." + entrees[1] + "." + entrees[2] + "." + entrees[3];
-			serverPort = Integer.parseInt(entrees[4]);
+			port = Integer.parseInt(entrees[4]);
 						
 				
 				
