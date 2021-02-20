@@ -30,15 +30,18 @@ public class Client {
 		
 			String helloMessageFromServer= in.readUTF();
 		
-		
-			out.writeUTF(sendCommand());
+			String command = sendCommand();
+			out.writeUTF(command);
 			System.out.println(in.readUTF());
 		
 		
 			System.out.println(helloMessageFromServer);
-			//TODO uniquement close le socket quand on veut exit
-			socket.close();
+			
+
+			
 		}
+		//TODO uniquement close le socket quand on veut exit
+		
 	}
 
 private static String sendCommand(){

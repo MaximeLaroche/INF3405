@@ -93,7 +93,7 @@ public class serveur {
 		System.out.format("The server is running on %s:%d%n", serverIP, port);
 
 		try {
-
+		
 			while (true) {
 				new ClientHandler(listener.accept(), clientNumber++).start();
 
@@ -117,27 +117,39 @@ public class serveur {
 		}
 
 		public void run() {
-			try {
-				while (exit == false) {
-
+			
+			try {	
+				DataInputStream in = new DataInputStream(socket.getInputStream());
 					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-
+				while (exit == false) {
+				
+					
 					out.writeUTF("Hello from server - you are client# " + clientNumber);
-
-					DataInputStream in = new DataInputStream(socket.getInputStream());
-
+					
+					
 					String query = in.readUTF();
 					System.out.println(query);
+					
 					String message = commands(query, socket);
 
 					out.writeUTF(message);
-
-					socket.close();
-				}
-
+					
+				}	
 			} catch (IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
 			}
+		finally{
+			try{
+				socket.close();
+			}catch(Exception e ){
+				System.out.print("Could not close the socket\n");
+			}	
+		}
+			
+			
+			
+			
+			
 
 		}
 
@@ -178,18 +190,36 @@ public class serveur {
 			}
 		
 			private static String cd(String whereTo) {
+				String message;
+				/*boolean directoryExists = false;
+				String files[] = currentDirectory.list();
+				currentDirectory.e*/
+				
 				currentDirectory = new File(whereTo);
-				String message = "Moved to " + whereTo;
+				if(currentDirectory.exists()){
+					message = "Moved to " + whereTo + "\n";
+				}else{
+					message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
+				}
+				
+				
 				System.out.println(message);
 				return message;
 			}
 		
 			private static String ls() {
+				if(currentDirectory ==null){
+					currentDirectory = new File(System.getProperty("user.dir"));
+					
+				}
 				String files[] = currentDirectory.list();
 				String message = "";
 				for (String file : files) {
 					System.out.println(file);
 					message += file + "\n";
+				}
+				if(files.length == 0){
+					message = "Directory is empty.\n";
 				}
 				return message;
 			}
