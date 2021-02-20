@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
+import java.text.SimpleDateFormat; 
 
 import java.util.*;
 
@@ -128,9 +130,11 @@ public class serveur {
 					
 					
 					String query = in.readUTF();
-					System.out.println(query);
+
+					printInfo(query);
 					
 					String message = commands(query, socket);
+
 
 					out.writeUTF(message);
 					
@@ -138,19 +142,23 @@ public class serveur {
 			} catch (IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
 			}
-		finally{
-			try{
-				socket.close();
-			}catch(Exception e ){
-				System.out.print("Could not close the socket\n");
-			}	
+			finally{
+				try{
+					socket.close();
+				}catch(Exception e ){
+					System.out.print("Could not close the socket\n");
+				}	
+			}
+			
 		}
-			
-			
-			
-			
-			
 
+		private static void printInfo(String command){
+			System.out.println("[" + ip +":"+ port + " - "+ getDate()+"]: " + command);
+		}
+
+		private static String getDate(){
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd @ HH:mm:ss");
+			return formatter.format(new Date());
 		}
 
 			//here
