@@ -93,7 +93,7 @@ public class serveur {
 		System.out.format("The server is running on %s:%d%n", serverIP, port);
 
 		try {
-
+		
 			while (true) {
 				new ClientHandler(listener.accept(), clientNumber++).start();
 
@@ -117,11 +117,13 @@ public class serveur {
 		}
 
 		public void run() {
-			try {
-				
-				while (exit == false) {
-					DataInputStream in = new DataInputStream(socket.getInputStream());
+			
+			try {	
+				DataInputStream in = new DataInputStream(socket.getInputStream());
 					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+				while (exit == false) {
+				
+					
 					out.writeUTF("Hello from server - you are client# " + clientNumber);
 					
 					
@@ -132,15 +134,22 @@ public class serveur {
 
 					out.writeUTF(message);
 					
-				}
-				if(exit == true){
-					socket.close();
-				}
-				
-
+				}	
 			} catch (IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
 			}
+		finally{
+			try{
+				socket.close();
+			}catch(Exception e ){
+				System.out.print("Could not close the socket\n");
+			}	
+		}
+			
+			
+			
+			
+			
 
 		}
 
