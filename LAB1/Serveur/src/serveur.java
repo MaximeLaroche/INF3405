@@ -9,7 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
-import java.text.SimpleDateFormat; 
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import java.util.*;
@@ -20,8 +20,6 @@ public class serveur {
 	private static String ip = "";
 	private static int port = 1;
 	private static Scanner keyboard = new Scanner(System.in);
-
-
 
 	private static void askAddress() {
 
@@ -85,7 +83,6 @@ public class serveur {
 		ip = "127.0.0.1";
 		port = 5000;
 
-
 		System.out.println("Veuillez entrer le no de client");
 		int clientNumber = 0;
 
@@ -97,10 +94,10 @@ public class serveur {
 		// Association de l'addresse et du port `ala connexion
 
 		listener.bind(new InetSocketAddress(serverIP, port));
-		System.out.format("The server is running on %s:%d%n", serverIP, port,"\n");
+		System.out.format("The server is running on %s:%d%n", serverIP, port, "\n");
 
 		try {
-		
+
 			while (true) {
 				new ClientHandler(listener.accept(), clientNumber++).start();
 			}
@@ -124,176 +121,162 @@ public class serveur {
 		}
 
 		public void run() {
-			
-			try {	
+
+			try {
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				while (exit == false) {
-				
-					
+
 					out.writeUTF("Hello from server - you are client# " + clientNumber);
-					
-					
+
 					String query = in.readUTF();
 
 					printInfo(query);
-					
+
 					String message = commands(query, socket);
 
-
 					out.writeUTF(message);
-					
-				}	
+
+				}
 			} catch (IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
 				e.getStackTrace();
-			}
-			finally{
-				try{
+			} finally {
+				try {
 					socket.close();
-				}catch(Exception e ){
+				} catch (Exception e) {
 					System.out.print("Could not close the socket\n");
 					e.getStackTrace();
-				}	
+				}
 			}
-			
+
 		}
 
-		private static void printInfo(String command){
-			System.out.println("[" + ip +":"+ port + " - "+ getDate()+"]: " + command);
+		private static void printInfo(String command) {
+			System.out.println("[" + ip + ":" + port + " - " + getDate() + "]: " + command);
 		}
 
-		private static String getDate(){
+		private static String getDate() {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd @ HH:mm:ss");
 			return formatter.format(new Date());
 		}
 
-			//here
+		// here
 
-			private static String commands(String entrees, Socket socket) {
-				/*
-				 * Commandes[0] est la commande le reste des index sont les argument
-				 */
-				
-				String[] commandes = entrees.split(" ", 2);
-				String output = "";
-				switch (commandes[0]) {
-					case "cd":
-						output = cd(commandes[1]);
-						break;
-					case "ls":
-						output = ls();
-						break;
-					case "mkdir":
-						output = mkdir(commandes[1]);
-						break;
-					case "upload":
-						output = upload(commandes[1]);
-						break;
-					case "download":
-						output = download(commandes[1]);
-						break;
-					case "exit":
-						output = "Client exited the server. Socket closed";
-						exit = true;
-						break;
-					default:
-						System.out.println("Commande invalide");
-				}
-				return output;
-		
+		private static String commands(String entrees, Socket socket) {
+			/*
+			 * Commandes[0] est la commande le reste des index sont les argument
+			 */
+
+			String[] commandes = entrees.split(" ", 2);
+			String output = "";
+			switch (commandes[0]) {
+				case "cd":
+					output = cd(commandes[1]);
+					break;
+				case "ls":
+					output = ls();
+					break;
+				case "mkdir":
+					output = mkdir(commandes[1]);
+					break;
+				case "upload":
+					output = upload(commandes[1]);
+					break;
+				case "download":
+					output = download(commandes[1]);
+					break;
+				case "exit":
+					output = "Client exited the server. Socket closed";
+					exit = true;
+					break;
+				default:
+					System.out.println("Commande invalide");
 			}
-		
-			private static String cd(String whereTo) {
-				String message;
-				/*boolean directoryExists = false;
-				String files[] = currentDirectory.list();
-				currentDirectory.e*/
-				
-				currentDirectory = new File(whereTo);
-				if(currentDirectory.exists()){
-					message = "Moved to " + whereTo + "\n";
-				}else{
-					message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
-				}
-				
-				
+			return output;
+
+		}
+
+		private static String cd(String whereTo) {
+			String message;
+			/*
+			 * boolean directoryExists = false; String files[] = currentDirectory.list();
+			 * currentDirectory.e
+			 */
+
+			File temp = new File(whereTo);
+			if (temp.exists()) {
+				currentDirectory = temp;
+				message = "Moved to " + whereTo + "\n";
+			} else {
+				message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
+			}
+
+			System.out.println(message);
+			return message;
+		}
+
+		private static String ls() {
+			if (currentDirectory == null) {
+				currentDirectory = new File(System.getProperty("user.dir"));
+				currentDirectory = new File("entrepotServeur");
+			}
+			String files[] = currentDirectory.list();
+			String message = "";
+			for (String file : files) {
+				System.out.println(file);
+				message += file + "\n";
+			}
+			if (files.length == 0) {
+				message = "Directory is empty.\n";
+			}
+			return message;
+		}
+
+		private static String mkdir(String directoryName) {
+			System.out.println("On est dans mkdir");
+			String message = "";
+			File folder = new File(currentDirectory.getPath()+"/"+directoryName);
+			if (folder.mkdir()) {
+				message = "votre dossier " + directoryName + " a ete cree";
 				System.out.println(message);
-				return message;
+				// out.writeUTF(message);
 			}
-		
-			private static String ls() {
-				if(currentDirectory ==null){
-					currentDirectory = new File(System.getProperty("user.dir"));
-					
-				}
-				String files[] = currentDirectory.list();
-				String message = "";
-				for (String file : files) {
-					System.out.println(file);
-					message += file + "\n";
-				}
-				if(files.length == 0){
-					message = "Directory is empty.\n";
-				}
-				return message;
-			}
-		
-			private static String mkdir(String directoryName) {
-				System.out.println("On est dans mkdir");
-				String message = "";
-				File folder = new File(directoryName);
-				if (folder.mkdir()) {
-					message = "votre dossier " + directoryName + " a ete cree";
-					System.out.println(message);
-					// out.writeUTF(message);
-				}
-				return message;
-		
-			}
-		
-			private static String upload(String fileName) {
-				
-				
-				FileOutputStream fileOut = null;
-			
-				try{
-					fileName = currentDirectory.getPath() +"/"+ fileName;
-					fileOut = new FileOutputStream(fileName);
-					long amount = socket.getInputStream().transferTo(fileOut);
-					//socket = listener.accept();
-					
-					fileOut.close();
+			return message;
 
-				}catch(Exception e){
-					System.out.println("could not transfer file\n");
-					e.getStackTrace();
-				}
-				
-				
-				String message = "Succesfully tranfered file";
-				return message;
-			}
-			}
-		
-			private static String download(String fileName) {
-				
-				FileInputStream fileIn = new FileInputStream(fileName);
-				//byte b[]= new byte[1000];
-				
-				
-				fileIn.transferTo(socket.getOutputStream());
-				
-				String message = "Succesfully tranfered file";
-				return message;
+		}
+
+		private static String upload(String fileName) {
+
+			FileOutputStream fileOut = null;
+
+			try {
+				fileName = currentDirectory.getPath() + "/" + fileName;
+				fileOut = new FileOutputStream(fileName);
+				long amount = socket.getInputStream().transferTo(fileOut);
+				// socket = listener.accept();
+
+				fileOut.close();
+
+			} catch (Exception e) {
+				System.out.println("could not transfer file\n");
+				e.getStackTrace();
 			}
 
-
-
-
-
+			String message = "Succesfully tranfered file";
+			return message;
+		}
 	}
 
-	
+	private static String download(String fileName) {
 
+		FileInputStream fileIn = new FileInputStream(fileName);
+		// byte b[]= new byte[1000];
 
+		fileIn.transferTo(socket.getOutputStream());
+
+		String message = "Succesfully tranfered file";
+		return message;
+	}
+
+}
