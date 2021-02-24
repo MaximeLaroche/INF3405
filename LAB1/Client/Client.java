@@ -1,6 +1,8 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,7 +24,7 @@ public class Client {
 
 		while(true){
 			socket = new Socket(ip,port);
-			System.out.format("Le serveur fonctionne sur :", ip, port);
+			System.out.format("Le serveur fonctionne sur :", ip, port,"\n");
 		
 		
 			DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -32,8 +34,27 @@ public class Client {
 		
 			String command = sendCommand();
 			out.writeUTF(command);
-			System.out.println(in.readUTF());
-		
+			if(command.contains("download")){
+				String fileName = command.split(" ",2)[1];
+				FileOutputStream fileOut = new FileOutputStream(fileName);
+				socket.getInputStream().transferTo(fileOut);
+			}else if(command.contains("upload")){
+				String fileName = command.split(" ",2)[1];
+				FileInputStream fileIn = new FileInputStream(fileName);
+
+				long amount = fileIn.transferTo(socket.getOutputStream());
+				//socket.close();
+				//socket = new Socket(ip,port);
+				fileIn.close();
+			}
+			
+			try{
+				System.out.println(in.readUTF());
+			}catch(Exception e){
+				e.getStackTrace();
+			}
+			
+			
 		
 			System.out.println(helloMessageFromServer);
 			
