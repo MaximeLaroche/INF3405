@@ -12,6 +12,8 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 
+import org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase;
+
 import java.util.*;
 
 public class serveur {
@@ -257,8 +259,18 @@ public class serveur {
 			try {
 				fileName = currentDirectory.getPath() + "/" + fileName;
 				fileOut = new FileOutputStream(fileName);
-				socket.getInputStream().transferTo(fileOut);
+				
+				DataInputStream in = new DataInputStream(socket.getInputStream());
+				long fileSize = in.readLong();
+				byte[] paquet = new byte[1024];
+				int paquetLenght;
+				while(fileSize>0){
+					paquetLenght = in.read(paquet);
+					fileOut.write(paquet, 0, paquetLenght);
+					fileSize -= paquetLenght;
+				}
 				fileOut.close();
+
 				message = "Succesfully tranfered file";
 
 			} catch (Exception e) {

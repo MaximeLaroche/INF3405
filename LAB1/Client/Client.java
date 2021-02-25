@@ -41,12 +41,22 @@ public class Client {
 				socket.getInputStream().transferTo(fileOut);
 			} else if (command.contains("upload")) {
 				String fileName = command.split(" ", 2)[1];
-				FileInputStream fileIn = new FileInputStream("entrepotLocal/" + fileName);
+				File file = new File("entrepotLocal/"+fileName);
+				FileInputStream fileIn = new FileInputStream(file);
 
-				long amount = fileIn.transferTo(socket.getOutputStream());
-				// socket.close();
-				// socket = new Socket(ip,port);
+				long fileSize = file.length();
+				boolean done = false;
+				out.writeLong(fileSize);
+				int paquetSize;
+				byte[] paquet = new byte[1024];
+				while(fileSize>0){
+					paquetSize = fileIn.read(paquet);
+					out.write(paquet, 0, paquetSize);
+					fileSize -= paquetSize;
+				}
+				done = true;
 				fileIn.close();
+
 			}
 
 			try {
