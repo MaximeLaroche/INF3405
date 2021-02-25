@@ -21,9 +21,9 @@ public class Client {
 		// askAddress();
 		ip = "192.168.0.127";
 		port = 5000;
-		
+
 		socket = new Socket(ip, port);
-		
+
 		while (true) {
 			System.out.format("Le serveur fonctionne sur :", ip, port, "\n");
 
@@ -41,36 +41,47 @@ public class Client {
 				socket.getInputStream().transferTo(fileOut);
 			} else if (command.contains("upload")) {
 				String fileName = command.split(" ", 2)[1];
-				File file = new File("entrepotLocal/"+fileName);
-				FileInputStream fileIn = new FileInputStream(file);
-
-				long fileSize = file.length();
-				boolean done = false;
-				out.writeLong(fileSize);
-				int paquetSize;
-				byte[] paquet = new byte[1024];
-				while(fileSize>0){
-					paquetSize = fileIn.read(paquet);
-					out.write(paquet, 0, paquetSize);
-					fileSize -= paquetSize;
-				}
-				done = true;
-				fileIn.close();
+				upload(fileName, socket);
 
 			}
 
 			try {
-				String response = in .readUTF();
+				String response = in.readUTF();
 				System.out.println(response);
 			} catch (Exception e) {
 				e.getStackTrace();
 			}
 
-			
-
 		}
 		// TODO uniquement close le socket quand on veut exit
 
+	}
+
+	private static void upload(String fileName, Socket socket) {
+
+		File file = new File("entrepotLocal/" + fileName);
+		DataOutputStream out = null;
+		if (file.exists()) {
+
+			long fileSize = file.length();
+
+			try {
+				FileInputStream fileIn = new FileInputStream(file);
+				out = new DataOutputStream(socket.getOutputStream());
+				out.writeLong(fileSize);
+				int paquetSize;
+				byte[] paquet = new byte[1024];
+				while (fileSize > 0) {
+					paquetSize = fileIn.read(paquet);
+					out.write(paquet, 0, paquetSize);
+					fileSize -= paquetSize;
+				}
+				fileIn.close();
+			} catch (Exception e) {
+				e.getStackTrace();
+			}
+
+		}
 	}
 
 	private static String sendCommand() {
