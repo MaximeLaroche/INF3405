@@ -19,17 +19,19 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		// askAddress();
-		ip = "127.0.0.1";
+		ip = "192.168.0.127";
 		port = 5000;
-
+		
+		socket = new Socket(ip, port);
+		
 		while (true) {
-			socket = new Socket(ip, port);
 			System.out.format("Le serveur fonctionne sur :", ip, port, "\n");
 
 			DataInputStream in = new DataInputStream(socket.getInputStream());
 			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
 			String helloMessageFromServer = in.readUTF();
+			System.out.println(helloMessageFromServer);
 
 			String command = sendCommand();
 			out.writeUTF(command);
@@ -48,12 +50,13 @@ public class Client {
 			}
 
 			try {
-				System.out.println(in.readUTF());
+				String response = in .readUTF();
+				System.out.println(response);
 			} catch (Exception e) {
 				e.getStackTrace();
 			}
 
-			System.out.println(helloMessageFromServer);
+			
 
 		}
 		// TODO uniquement close le socket quand on veut exit
