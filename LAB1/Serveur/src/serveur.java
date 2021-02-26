@@ -10,20 +10,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.Vector;
-
-//import org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase;
-
 import java.util.*;
 
-public class serveur{
+public class serveur {
 
 	private static ServerSocket listener;
 	private static String ip = "";
 	private static int port = 1;
 	private static Scanner keyboard = new Scanner(System.in);
 
-	private void askAddress() {
+	private static void askAddress() {
+		/*
+		 * Cette fonction reste dans une boucle infinie jusqu'à ce que les variables
+		 * globales ip et port ait un bon format
+		 */
 
 		boolean hasValidAddress = false;
 
@@ -81,19 +81,14 @@ public class serveur{
 
 	public static void main(String[] args) throws Exception {
 
-		// askAddress();
-		ip = "127.0.0.1";
-		port = 5000;
+		askAddress();
 
-		System.out.println("Veuillez entrer le no de client");
 		int clientNumber = 0;
 
-		// Cr?ation de la connexion pour communiquer avec
+		// Création de la connexion pour communiquer avec
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
 		InetAddress serverIP = InetAddress.getByName(ip);
-
-		// Association de l'addresse et du port `ala connexion
 
 		listener.bind(new InetSocketAddress(serverIP, port));
 		System.out.format("The server is running on %s:%d%n", serverIP, port, "\n");
@@ -123,7 +118,7 @@ public class serveur{
 
 			if (currentDirectory == null) {
 				currentDirectory = new File(System.getProperty("user.dir"));
-				currentDirectory = new File("entrepotServeur");
+				//currentDirectory = new File("entrepotServeur");
 			}
 		}
 
@@ -134,14 +129,15 @@ public class serveur{
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				while (exit == false) {
 
+					// Envoyer un premier message au client
 					out.writeUTF("Hello from server - you are client# " + clientNumber);
 
+					// Écouter la demande du client
 					String query = in.readUTF();
-
 					printInfo(query);
 
+					// Gérer la commande du client et retourner la réponse dans "message"
 					String message = commands(query, socket);
-
 					out.writeUTF(message);
 
 				}
@@ -168,8 +164,6 @@ public class serveur{
 			return formatter.format(new Date());
 		}
 
-		// here
-
 		private String commands(String entrees, Socket socket) {
 			/*
 			 * Commandes[0] est la commande le reste des index sont les argument
@@ -178,27 +172,27 @@ public class serveur{
 			String[] commandes = entrees.split(" ", 2);
 			String output = "";
 			switch (commandes[0]) {
-			case "cd":
-				output = cd(commandes[1]);
-				break;
-			case "ls":
-				output = ls();
-				break;
-			case "mkdir":
-				output = mkdir(commandes[1]);
-				break;
-			case "upload":
-				output = upload(commandes[1]);
-				break;
-			case "download":
-					download(commandes[1]);
-				break;
-			case "exit":
-				output = "Client exited the server. Socket closed";
-				exit = true;
-				break;
-			default:
-				System.out.println("Commande invalide");
+				case "cd":
+					output = cd(commandes[1]);
+					break;
+				case "ls":
+					output = ls();
+					break;
+				case "mkdir":
+					output = mkdir(commandes[1]);
+					break;
+				case "upload":
+					output = upload(commandes[1]);
+					break;
+				case "download":
+					output = download(commandes[1]);
+					break;
+				case "exit":
+					output = "Client exited the server. Socket closed";
+					exit = true;
+					break;
+				default:
+					System.out.println("Commande invalide");
 			}
 			return output;
 
@@ -206,16 +200,13 @@ public class serveur{
 
 		private String cd(String whereTo) {
 			String message;
-			/*
-			 * boolean directoryExists = false; String files[] = currentDirectory.list();
-			 * currentDirectory.e
-			 */
+			
 
 			File temp = new File(whereTo);
-			currentDirectory = temp;
-			// TODO cette section s'ex�cute bizzarement
+			
+			
 			if (temp.exists()) {
-
+				currentDirectory = temp;
 				message = "Moved to " + whereTo + "\n";
 			} else {
 				message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
@@ -283,15 +274,16 @@ public class serveur{
 
 		private String download(String fileName) {
 			String message = "downloading 99%... aka(failed)";
-			File file = new File("entrepotServeur/" + fileName);
+			File file = new File(/*"entrepotServeur/" + */ fileName);
 			DataOutputStream out = null;
-			if (file.exists()) {
+			if (file.exists() && file.length() > 0) {
 
 				long fileSize = file.length();
 
 				try {
 					FileInputStream fileIn = new FileInputStream(file);
 					out = new DataOutputStream(socket.getOutputStream());
+					out.writeBoolean(file.exists());
 					out.writeLong(fileSize);
 					int paquetSize;
 					byte[] paquet = new byte[1024];
@@ -306,10 +298,20 @@ public class serveur{
 					e.getStackTrace();
 				}
 
+			} else {
+				boolean exists = false;
+				message = "Could not download " + fileName + ". It does not exist";
+				try {
+					out = new DataOutputStream(socket.getOutputStream());
+					out.writeBoolean(exists);
+				} catch (Exception e) {
+					e.getStackTrace();
+					System.out.println("Error sending response");
+				}
+
 			}
 			return message;
 		}
 	}
-
 
 }

@@ -3,11 +3,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.*;
 import java.util.Scanner;
 
 public class Client {
@@ -18,9 +14,7 @@ public class Client {
 	private static int port = 0;
 
 	public static void main(String[] args) throws Exception {
-		// askAddress();
-		ip = "127.0.0.1";
-		port = 5000;
+		askAddress();
 
 		socket = new Socket(ip, port);
 
@@ -36,11 +30,12 @@ public class Client {
 			String command = sendCommand();
 			out.writeUTF(command);
 			if (command.contains("download")) {
+
 				String fileName = command.split(" ", 2)[1];
-				
 				download(fileName, socket);
+
 			} else if (command.contains("upload")) {
-				
+
 				String fileName = command.split(" ", 2)[1];
 				upload(fileName, socket);
 
@@ -51,10 +46,10 @@ public class Client {
 				System.out.println(response);
 			} catch (Exception e) {
 				e.getStackTrace();
+				System.out.println("Could not get response from server");
 			}
 
 		}
-		// TODO uniquement close le socket quand on veut exit
 
 	}
 
@@ -62,11 +57,13 @@ public class Client {
 
 		File file = new File(fileName);
 		DataOutputStream out = null;
+
 		if (file.exists()) {
 
 			long fileSize = file.length();
 
 			try {
+
 				FileInputStream fileIn = new FileInputStream(file);
 				out = new DataOutputStream(socket.getOutputStream());
 				out.writeLong(fileSize);
@@ -78,46 +75,70 @@ public class Client {
 					fileSize -= paquetSize;
 				}
 				fileIn.close();
+
 			} catch (Exception e) {
+				System.out.println("Error while uploading file. Please try again.");
 				e.getStackTrace();
 			}
 
+		} else {
+			System.out.println(fileName + "does not exist.");
 		}
 	}
-	private static void download(String fileName, Socket socket) {
-		FileOutputStream fileOut = null;
-		 File currentDirectory = new File(System.getProperty("user.dir"));;
+
+	private static boolean responseExist() {
+		/* 
+		Cette fonction attent une réponse du serveur pour savoir si le fichier à télécharger existe*/
+		boolean fileExists = false;
 		try {
-			fileName = currentDirectory.getPath() + "/" + fileName;
-			fileOut = new FileOutputStream(fileName);
-
 			DataInputStream in = new DataInputStream(socket.getInputStream());
-			long fileSize = in.readLong();
-			byte[] paquet = new byte[1024];
-			int paquetLenght;
-			while (fileSize > 0) {
-				paquetLenght = in.read(paquet);
-				fileOut.write(paquet, 0, paquetLenght);
-				fileSize -= paquetLenght;
-			}
-			fileOut.close();
-
+			fileExists = in.readBoolean();
 		} catch (Exception e) {
+			System.out.println("Could not get response from server.");
 			e.getStackTrace();
 		}
 
-
-	
+		return fileExists;
 	}
-	
+
+	private static void download(String fileName, Socket socket) {
+		FileOutputStream fileOut = null;
+		if (responseExist()) {
+			try {
+
+				fileOut = new FileOutputStream(fileName);
+				DataInputStream in = new DataInputStream(socket.getInputStream());
+
+				//Transfert et écriture du fichier
+				long fileSize = in.readLong();
+				byte[] paquet = new byte[1024];
+				int paquetLenght;
+				while (fileSize > 0) {
+					paquetLenght = in.read(paquet);
+					fileOut.write(paquet, 0, paquetLenght);
+					fileSize -= paquetLenght;
+				}
+				fileOut.close();
+
+			} catch (Exception e) {
+				System.out.println("Could not download file. Please try again.");
+				e.getStackTrace();
+			}
+		}
+
+	}
+
 	private static String sendCommand() {
+		/* Retourne la commande tapé par l'utilisateur*/
 		System.out.println("Envoyer une commande au serveur");
 		return keyboard.nextLine();
 	}
 
-	// Verifier bonne adresse IP
+	
 	private static void askAddress() {
-
+		/* Verifier bonne adresse IP. Reste dans une boucle infini jsuqu'à ce que l'addresse ip et le port soit dans le bon format.
+		retourne rien
+		modifie directement les variables globales pour l'addresse IP et le port*/
 		boolean hasValidAddress = false;
 
 		String badIP = "Veuillez entrer des nombres entre 0 et 255 separ�s par un .\n Par exemple, 152.0.54.254";
@@ -127,7 +148,7 @@ public class Client {
 
 			hasValidAddress = true;
 			String ligne;
-			// Separer les octets par "." et le port par ":"
+			// Separer les octets par "." et le port par ":" 
 			String entrees[] = {};
 			do {
 				System.out.println(
@@ -137,8 +158,8 @@ public class Client {
 
 			} while (entrees.length != 5);
 
-			// Valider l'addresse IP
 
+			// Valider l'addresse IP entré par l'utilisateur
 			for (int i = 0; i < 4; i++) {
 				int temp;
 				try {
