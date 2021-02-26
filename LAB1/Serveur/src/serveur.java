@@ -201,16 +201,16 @@ public class serveur {
 		private String cd(String whereTo) {
 			String message;
 			
-
+			
 			File temp = new File(whereTo);
-			
-			
 			if (temp.exists()) {
-				currentDirectory = temp;
+				currentDirectory = new File(currentDirectory,whereTo);
 				message = "Moved to " + whereTo + "\n";
 			} else {
 				message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
 			}
+			
+			
 
 			System.out.println(message);
 			return message;
