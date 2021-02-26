@@ -19,7 +19,7 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		// askAddress();
-		ip = "192.168.0.127";
+		ip = "127.0.0.1";
 		port = 5000;
 
 		socket = new Socket(ip, port);
@@ -37,9 +37,10 @@ public class Client {
 			out.writeUTF(command);
 			if (command.contains("download")) {
 				String fileName = command.split(" ", 2)[1];
-				FileOutputStream fileOut = new FileOutputStream(fileName);
-				socket.getInputStream().transferTo(fileOut);
+				
+				download(fileName, socket);
 			} else if (command.contains("upload")) {
+				
 				String fileName = command.split(" ", 2)[1];
 				upload(fileName, socket);
 
@@ -59,7 +60,7 @@ public class Client {
 
 	private static void upload(String fileName, Socket socket) {
 
-		File file = new File("entrepotLocal/" + fileName);
+		File file = new File(fileName);
 		DataOutputStream out = null;
 		if (file.exists()) {
 
@@ -83,7 +84,32 @@ public class Client {
 
 		}
 	}
+	private static void download(String fileName, Socket socket) {
+		FileOutputStream fileOut = null;
+		 File currentDirectory = new File(System.getProperty("user.dir"));;
+		try {
+			fileName = currentDirectory.getPath() + "/" + fileName;
+			fileOut = new FileOutputStream(fileName);
 
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			long fileSize = in.readLong();
+			byte[] paquet = new byte[1024];
+			int paquetLenght;
+			while (fileSize > 0) {
+				paquetLenght = in.read(paquet);
+				fileOut.write(paquet, 0, paquetLenght);
+				fileSize -= paquetLenght;
+			}
+			fileOut.close();
+
+		} catch (Exception e) {
+			e.getStackTrace();
+		}
+
+
+	
+	}
+	
 	private static String sendCommand() {
 		System.out.println("Envoyer une commande au serveur");
 		return keyboard.nextLine();

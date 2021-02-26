@@ -12,11 +12,11 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 
-import org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase;
+//import org.graalvm.compiler.lir.alloc.lsra.LinearScanAssignLocationsPhase;
 
 import java.util.*;
 
-public class serveur {
+public class serveur{
 
 	private static ServerSocket listener;
 	private static String ip = "";
@@ -27,7 +27,7 @@ public class serveur {
 
 		boolean hasValidAddress = false;
 
-		String badIP = "Veuillez entrer des nombres entre 0 et 255 separ�s par un .\n Par exemple, 127.0.0.1";
+		String badIP = "Veuillez entrer des nombres entre 0 et 255 separ?s par un .\n Par exemple, 127.0.0.1";
 		String badPort = "Veuillez entrer uniquement un nombre entre 5000 et 5050 pour le port";
 
 		do {
@@ -82,13 +82,13 @@ public class serveur {
 	public static void main(String[] args) throws Exception {
 
 		// askAddress();
-		ip = "192.168.0.127";
+		ip = "127.0.0.1";
 		port = 5000;
 
 		System.out.println("Veuillez entrer le no de client");
 		int clientNumber = 0;
 
-		// Cr�ation de la connexion pour communiquer avec
+		// Cr?ation de la connexion pour communiquer avec
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
 		InetAddress serverIP = InetAddress.getByName(ip);
@@ -178,27 +178,27 @@ public class serveur {
 			String[] commandes = entrees.split(" ", 2);
 			String output = "";
 			switch (commandes[0]) {
-				case "cd":
-					output = cd(commandes[1]);
-					break;
-				case "ls":
-					output = ls();
-					break;
-				case "mkdir":
-					output = mkdir(commandes[1]);
-					break;
-				case "upload":
-					output = upload(commandes[1]);
-					break;
-				case "download":
-					output = download(commandes[1]);
-					break;
-				case "exit":
-					output = "Client exited the server. Socket closed";
-					exit = true;
-					break;
-				default:
-					System.out.println("Commande invalide");
+			case "cd":
+				output = cd(commandes[1]);
+				break;
+			case "ls":
+				output = ls();
+				break;
+			case "mkdir":
+				output = mkdir(commandes[1]);
+				break;
+			case "upload":
+				output = upload(commandes[1]);
+				break;
+			case "download":
+					download(commandes[1]);
+				break;
+			case "exit":
+				output = "Client exited the server. Socket closed";
+				exit = true;
+				break;
+			default:
+				System.out.println("Commande invalide");
 			}
 			return output;
 
@@ -213,9 +213,9 @@ public class serveur {
 
 			File temp = new File(whereTo);
 			currentDirectory = temp;
-			// TODO cette section s'exécute bizzarement
+			// TODO cette section s'ex�cute bizzarement
 			if (temp.exists()) {
-				
+
 				message = "Moved to " + whereTo + "\n";
 			} else {
 				message = "Impossible to move to " + whereTo + ". The directory does not exist\n";
@@ -226,7 +226,7 @@ public class serveur {
 		}
 
 		private String ls() {
-			
+
 			String files[] = currentDirectory.list();
 			String message = "";
 			for (String file : files) {
@@ -242,7 +242,7 @@ public class serveur {
 		private String mkdir(String directoryName) {
 			System.out.println("On est dans mkdir");
 			String message = "";
-			File folder = new File(currentDirectory.getPath()+"/"+directoryName);
+			File folder = new File(currentDirectory.getPath() + "/" + directoryName);
 			if (folder.mkdir()) {
 				message = "votre dossier " + directoryName + " a ete cree";
 				System.out.println(message);
@@ -259,12 +259,12 @@ public class serveur {
 			try {
 				fileName = currentDirectory.getPath() + "/" + fileName;
 				fileOut = new FileOutputStream(fileName);
-				
+
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				long fileSize = in.readLong();
 				byte[] paquet = new byte[1024];
 				int paquetLenght;
-				while(fileSize>0){
+				while (fileSize > 0) {
 					paquetLenght = in.read(paquet);
 					fileOut.write(paquet, 0, paquetLenght);
 					fileSize -= paquetLenght;
@@ -278,21 +278,38 @@ public class serveur {
 				e.getStackTrace();
 			}
 
-			
 			return message;
 		}
-		private String download(String fileName) {
 
-			FileInputStream fileIn = new FileInputStream(fileName);
-			// byte b[]= new byte[1000];
-	
-			fileIn.transferTo(socket.getOutputStream());
-	
-			String message = "Succesfully tranfered file";
+		private String download(String fileName) {
+			String message = "downloading 99%... aka(failed)";
+			File file = new File("entrepotServeur/" + fileName);
+			DataOutputStream out = null;
+			if (file.exists()) {
+
+				long fileSize = file.length();
+
+				try {
+					FileInputStream fileIn = new FileInputStream(file);
+					out = new DataOutputStream(socket.getOutputStream());
+					out.writeLong(fileSize);
+					int paquetSize;
+					byte[] paquet = new byte[1024];
+					while (fileSize > 0) {
+						paquetSize = fileIn.read(paquet);
+						out.write(paquet, 0, paquetSize);
+						fileSize -= paquetSize;
+					}
+					fileIn.close();
+					message = "File download successfully";
+				} catch (Exception e) {
+					e.getStackTrace();
+				}
+
+			}
 			return message;
 		}
 	}
 
-	
 
 }
